@@ -1,0 +1,39 @@
+version: "3.8"
+name: simple_spring_sample
+services:
+  db:
+    container_name: SpringSample_Postgresql
+    image: postgres:latest
+    volumes:
+      - /D/Docker/postgres/Data:/var/lib/postgresql
+    ports:
+        - "5432:5432"
+    environment:
+      POSTGRES_USER: pguser
+      POSTGRES_PASSWORD: Test1234=
+      POSTGRES_DB: simpleAppDb
+
+  pgAdmin:
+    image: dpage/pgadmin4
+    container_name: SpringSample_PgAdmin
+    ports:
+      - "8080:80"
+      - "4433:443"
+    depends_on:
+      - db
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=springApp@cognitic.be
+      - PGADMIN_DEFAULT_PASSWORD=Test1234=
+
+  app:
+    build: ./.
+    container_name: SpringSample_App
+    ports:
+      - "8081:8080"
+    depends_on:
+      - db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/simpleAppDb
+      - SPRING_DATASOURCE_USERNAME=pguser
+      - SPRING_DATASOURCE_PASSWORD=Test1234=
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
